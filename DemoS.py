@@ -140,27 +140,27 @@ def RECEIVE_MESSAGE(Op):
                     sendMessage(u'成功更改設定: %s'%(reply), receiver, _from)
 
 def NOTIFIED_DESTROY_MESSAGE(Op):
-    if op.param2 in REVMSG:
-        GRM = REVMSG[op.param2]
+    if Op.param2 in REVMSG:
+        GRM = REVMSG[Op.param2]
         if GRM['type'] == 'text':
-            client.sendMessage(op.param1, "@player嘗試想收回訊息www\n他想收回的內容是: %s"%(GRM['text']), {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'})
+            client.sendMessage(Op.param1, "@player嘗試想收回訊息www\n他想收回的內容是: %s"%(GRM['text']), {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'})
         elif GRM['type'] == 'sticker':
-            client.sendMessage(op.param1, "@player嘗試想收回訊息www\n他想收回的內容是一則貼圖OxO", {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'%(GRM['sender'])})
+            client.sendMessage(Op.param1, "@player嘗試想收回訊息www\n他想收回的內容是一則貼圖OxO", {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'%(GRM['sender'])})
             url = 'https://stickershop.line-scdn.net/stickershop/v1/sticker/' + GRM['data'] + '/ANDROID/sticker.png'
             try:
-                client.sendImageWithURL(op.param1, url)
+                client.sendImageWithURL(Op.param1, url)
             except:
-                client.sendMessage(op.param1, "嘛...也罷, 就放妳一馬吧(゜∀。)")
+                client.sendMessage(Op.param1, "嘛...也罷, 就放妳一馬吧(゜∀。)")
         elif GRM['type'] == 'image':
-            client.sendMessage(op.param1, "@player嘗試想收回訊息www\n他想收回的內容是一張圖片(Ŏ艸Ŏ)\n來看看他想收回甚麼不可告人的圖片吧w", {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'%(GRM['sender'])})
-            igp = r'./%s'%(op.param2)
+            client.sendMessage(Op.param1, "@player嘗試想收回訊息www\n他想收回的內容是一張圖片(Ŏ艸Ŏ)\n來看看他想收回甚麼不可告人的圖片吧w", {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'%(GRM['sender'])})
+            igp = r'./%s'%(Op.param2)
             try:
-                client.sendImage(op.param1, igp)
+                client.sendImage(Op.param1, igp)
             except:
-                client.sendMessage(op.param1, "嘛...也罷, 就放妳一馬吧(゜∀。)")
+                client.sendMessage(Op.param1, "嘛...也罷, 就放妳一馬吧(゜∀。)")
         else:
-            client.sendMessage(op.param1, "@player嘗試想收回訊息www\n他想收回的內容是我不能解析的類型_(:3」∠)_", {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'%(GRM['sender'])})
-        del REVMSG[op.param2] #釋放
+            client.sendMessage(Op.param1, "@player嘗試想收回訊息www\n他想收回的內容是我不能解析的類型_(:3」∠)_", {'MENTION':'{"MENTIONEES":[{"S":"0","E":"7","M":"%s"}]}'%(GRM['sender'])})
+        del REVMSG[Op.param2] #釋放
 
 
 def GroupSetting(group):
