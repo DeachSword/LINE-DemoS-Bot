@@ -1,4 +1,16 @@
+'''
+    THIS FILE IS MADE BY DeachSword Team
+    
+    * You promise that you will not sell this file or its functions for profit-making behavior
+    * You use this file only for research
+    * This is a public file, so you should not modify any content of this header
+    * It contains dangerous functions, if you know how to use it, please do not modify it for secondary dissemination
+    
+    
+    version: 1.0.1
+    author:  YinMo
 
+'''
 import requests, json
 
 
@@ -28,6 +40,14 @@ class DSClova(object):
         return botInfo
 
     def updateName(self, sharedAccountBotId, displayName):
+        # 也許有一些限制存在...?
+        # 我使用v2進行改名, 並且以3秒間隔持續了6小時
+        # 最後, 我收到了"資源不存在"
+        # 它表示v2已不支援? 或是bot受到了規制?
+        # 
+        # 更新: 我必須暫時關閉此專案, 因為官方對其進行了調整
+        #       調整內容包含了/v2, 所以這解釋了為甚麼我得到了"資源不存在"的錯誤
+        #       如果你已經看到此檔案, 則代表它已被更新, 也許你可以正常使用它, 也許不能.
         payload = {
           "data": {
             "displayName": f"{displayName}"
@@ -39,30 +59,6 @@ class DSClova(object):
         return botInfo
 
     def getLineSchemeToAddBotAsFriend(self, sharedAccountBotId):
-        payload = {
-          "method": "GET",
-          "path": f"/shared_accounts/{sharedAccountBotId}/add_bot_scheme"
-        }
-        id = self._request.post(self.gwUrl, data=json.dumps(payload)).text #URL
-        return id
-
-    def sendMessage(self, sharedAccountBotId, text):
-        payload = {
-          "method": "GET",
-          "path": f"/shared_accounts/{sharedAccountBotId}/add_bot_scheme"
-        }
-        id = self._request.post(self.gwUrl, data=json.dumps(payload)).text #URL
-        return id
-
-    def sendMessageV2(self, sharedAccountBotId, text):
-        payload = {
-          "method": "GET",
-          "path": f"/shared_accounts/{sharedAccountBotId}/add_bot_scheme"
-        }
-        id = self._request.post(self.gwUrl, data=json.dumps(payload)).text #URL
-        return id
-
-    def sendMessageV3(self, sharedAccountBotId, text):
         payload = {
           "method": "GET",
           "path": f"/shared_accounts/{sharedAccountBotId}/add_bot_scheme"
