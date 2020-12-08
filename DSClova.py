@@ -106,4 +106,14 @@ class DSClova(object):
         }
         res = json.loads(self._request.post(self.gwUrl, data=json.dumps(payload)).text)
         return res
+
+    def updateProfilePic(self, sharedAccountBotId, path):
+        data = open(path, 'rb').read()
+        headers = {
+            "Authorization": f"Bearer {self.token}", 
+            "X-Clova-Messenger-Bot-Id": sharedAccountBotId, 
+            'Content-Type': 'image/jpeg'
+            }
+        res = self._request.post(self.gwUrl + 'profile-image', data=data, headers=headers)
+        return res
         
