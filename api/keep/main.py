@@ -2,7 +2,7 @@
 
 import json, time, base64
 
-class Timeline():
+class LineKeep():
 
 
     def syncKeep(self, revision=0, limit=30):
