@@ -52,4 +52,34 @@ class Timeline():
         r = self.server.postContent(url, data=data, headers=hr)
         
         #{"code":0,"message":"success","result":true}
+        return r.json()    
+        
+
+    def getAlbumImages(self, mid, albumId):
+        params = {'homeId': mid}
+        
+        hr = self.server.additionalHeaders(self.server.timelineHeaders, {
+            'x-lhm': 'GET',
+            'content-type': "application/json",
+        })
+
+        url = self.server.urlEncode('https://gwz.line.naver.jp/ext/album', '/api/v3/photos/%s' % albumId, params)
+        r = self.server.postContent(url, headers=hr)
+        
+        return r.json()    
+        
+    def deleteAlbumImages(self, mid, albumId, id):
+        #id 4620693219800810323, not oid
+        params = {'homeId': mid}
+        data = json.dumps({"photos":[{"id": id}]})
+            
+        
+        hr = self.server.additionalHeaders(self.server.timelineHeaders, {
+            'x-lhm': 'POST',
+            'content-type': "application/json"
+        })
+
+        url = self.server.urlEncode('https://gwz.line.naver.jp/ext/album', '/api/v3/photos/delete/%s' % albumId, params)
+        r = self.server.postContent(url, data=data, headers=hr)
+        #{"code":0,"message":"success","result":true}
         return r.json()
