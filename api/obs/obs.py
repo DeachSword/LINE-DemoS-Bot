@@ -51,11 +51,24 @@ class TimelineObs():
             raise Exception('Invalid type value')
         headers=None
         files = {'file': open(path, 'rb')}
-        url = 'https://obs.line-apps.com/talk/m/upload.nhn'
-        if type == 'image' or type == 'video' or type == 'audio' or type == 'file':
-            data = {'params': self.genOBSParams({'oid': objId,'size': len(open(path, 'rb').read()),'type': type})}
+        #url = 'https://obs.line-apps.com/talk/m/upload.nhn' #if reqseq not working
+        url = 'https://obs.line-apps.com/r/talk/m/reqseq'
+        params = {
+            "type": "image",
+            "ver": "2.0",
+            "name": files['file'].name,
+            "oid": "reqseq",
+            "reqseq": str(self.revision),
+            "cat": "original"
+        }
+        if objId != None:
+            params['oid'] = objId
+        if to != None:
+            params['tomid'] = to
+        if type != 'gif':
+            params['type'] = type
+            data = {'params': self.genOBSParams(params)}
         elif type == 'gif':
-            url = 'https://obs.line-apps.com/r/talk/m/reqseq'
             params = {
                 'type': 'image',
                 'ver': '2.0',
@@ -75,5 +88,6 @@ class TimelineObs():
             })
         r = self.server.postContent(url, data=data, headers=headers, files=files)
         if r.status_code != 201:
+            console.log("uploadObjTalk: ", r.text)
             raise Exception('Upload %s failure.' % type)
         return objId
