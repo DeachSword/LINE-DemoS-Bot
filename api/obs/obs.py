@@ -90,4 +90,8 @@ class TimelineObs():
         if r.status_code != 201:
             console.log("uploadObjTalk: ", r.text)
             raise Exception('Upload %s failure.' % type)
+        else:
+            if objId is None:
+                objId = r.headers['x-obs-oid'] #the message seq, if u oid using reqseq
+            objHash = r.headers['x-obs-hash']  #for view on cdn
         return objId
