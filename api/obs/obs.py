@@ -45,3 +45,35 @@ class TimelineObs():
         if r.status_code != 201:
             raise Exception(f"Upload object home failure. Receive statue code: {r.status_code}")
         return objId
+        
+    def uploadObjTalk(self, path=None, type='image', objId=None, to=None):
+        if type not in ['image','gif','video','audio','file']:
+            raise Exception('Invalid type value')
+        headers=None
+        files = {'file': open(path, 'rb')}
+        url = 'https://obs.line-apps.com/talk/m/upload.nhn'
+        if type == 'image' or type == 'video' or type == 'audio' or type == 'file':
+            data = {'params': self.genOBSParams({'oid': objId,'size': len(open(path, 'rb').read()),'type': type})}
+        elif type == 'gif':
+            url = 'https://obs.line-apps.com/r/talk/m/reqseq'
+            params = {
+                'type': 'image',
+                'ver': '2.0',
+                'name': files['file'].name,
+                'oid': 'reqseq',
+                'reqseq': '%s' % str(self.revision),
+                'tomid': '%s' % str(to),
+                'cat': 'original'
+            }
+            files = None
+            data = open(path, 'rb').read()
+            headers = self.server.additionalHeaders(self.server.Headers, {
+                'content-type': 'image/gif',
+                'Content-Length': str(len(data)),
+                'x-obs-params': self.genOBSParams(params,'b64'), #base64 encode
+                'X-Line-Access': self.acquireEncryptedAccessToken()[7:]
+            })
+        r = self.server.postContent(url, data=data, headers=headers, files=files)
+        if r.status_code != 201:
+            raise Exception('Upload %s failure.' % type)
+        return objId

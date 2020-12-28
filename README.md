@@ -1,1 +1,22 @@
 # LINE-DemoS-Bot-By-Python3
+
+>What is DemoS?\
+>It is a LINE bot, but died in 2016
+
+
+## About Project
+Q: If the bot is dead, will the project still be updated? \
+A: yea\
+And the bot is still in run, the current project name is __DearSakura__
+
+If you can help update this project, welcome to join our [Discord](https://discord.gg/vQrMbjA)
+
+#
+## Function overview
+- Keep Service
+- Timeline Service
+    - Album
+- OBS Service
+    - uploadObjHome
+    - updateProfileCover
+    - uploadObjTalk
