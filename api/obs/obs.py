@@ -96,12 +96,10 @@ class TimelineObs():
             objHash = r.headers['x-obs-hash']  #for view on cdn
         return objId
         
-    def copyAndGetOidForKeep(self, to, msgId, contentType='image'):
+    def copyAndGetOidForKeep(self, msgId, contentType='image'):
         if contentType not in ['image','video','audio','file']:
             raise Exception('Type not valid.')
-        data = self.genOBSParams({'oid': 'reqseq','reqseq': self.revision,'type': contentType,'copyFrom': '/talk/m/%s' % msgId},'default')
-        
-   
+        data = self.genOBSParams({'oid': 'reqseq','reqseq': 0,'type': contentType,'copyFrom': '/talk/m/%s' % msgId},'default')
         hr = self.server.additionalHeaders(self.server.timelineHeaders, {
             'X-Line-Mid': self.profile.mid,
             'x-obs-host': 'obs.line-apps.com',
@@ -111,5 +109,5 @@ class TimelineObs():
         r = self.server.postContent('https://gwz.line.naver.jp/oa/r/keep/p/linekeep_13289430591980tffffffff/copy.nhn', data=data, headers=hr)
         # linekeep_13289430591980tffffffff is "linekeep_" + msgId + "tffffffff"
         if r.status_code != 200:
-            raise Exception('copy object failure.')
+            raise Exception(f"Copy object failure. Receive statue code: {r.status_code}")
         return r.headers['x-obs-oid']
