@@ -10,3 +10,31 @@ class Models(object):
         self.encryptKey = b"DearSakura+2020/"
         self.cipher = rsaenc.new(self.key)
         self._encryptKey = b"0005" + b64encode(self.cipher.encrypt(self.encryptKey))
+    
+    def encHeaders(self):
+        headers = {
+            "X-Line-Access": "SQ4a4653687737647351757355464a546a78386675554974306f624b3352713442",
+            "x-lpqs": "/acct/lp/lgn/sq/v1"
+        }
+        t = headers.keys()
+        data = []
+        for i in t:
+            self.mFhrnmxnNF(len(t), data)
+            print(data)
+            self.mFhrnmxnNF(len(i), data)
+            self.wYEpEYldst(i, data)
+            self.mFhrnmxnNF(len(headers[i]), data)
+            self.wYEpEYldst(headers[i], data)
+        return data
+        
+    
+    def mFhrnmxnNF(self, t, e):
+        i = 65536 
+        if t < -1 * 32768 or t >= i:
+            raise Exception(t + " is incorrect for i16.")
+        e.append(255 & t >> 8)
+        e.append(255 & t)
+        
+    def wYEpEYldst(self, t, e):
+        for i in range(len(t)):
+            e.append(ord(t[i]))
