@@ -12,6 +12,7 @@ class Models(object):
         self.encryptKey = b"DearSakura+2020/"
         self.IV = bytes([78, 9, 72, 62, 56, 245, 255, 114, 128, 18, 123, 158, 251, 92, 45, 51])
         self.cipher = AES.new(self.encryptKey, AES.MODE_CBC, iv=self.IV)
+        self.d_cipher = AES.new(self.encryptKey, AES.MODE_CBC, iv=self.IV)
         self.encEncKey()
 
     def encHeaders(self, headers):
@@ -35,6 +36,16 @@ class Models(object):
         
     def encData(self, data):
         _data = self.cipher.encrypt(pad(data, AES.block_size))
+        return _data
+        #return _data + self.XQqwlHlXKK(self.encryptKey, _data)
+        
+    def decData(self, data):
+        data = pad(data, AES.block_size)
+        _data = self.d_cipher.decrypt(data)
+        i = 1
+        data = self.yVdzCLDwMN(_data, i)
+        print(data)
+        i = 3
         return _data
         #return _data + self.XQqwlHlXKK(self.encryptKey, _data)
         
@@ -93,4 +104,14 @@ class Models(object):
         #var c = this.xZVpUuXFru(n.digest().toString(16));
         #return this.pmAWhahfKx(c)
         #[35, 62, 236, 68]
+        
+    def yVdzCLDwMN(self, d, i):
+        return (255 & self.xnEmbaRWhy(d, i)) << 8 | 255 & self.xnEmbaRWhy(d, i+1)
+    
+        
+    def xnEmbaRWhy(self, d, i):
+        t = d[i];
+        if t > 127:
+            t = 0 - (t - 1 ^ 255)
+        return t
             

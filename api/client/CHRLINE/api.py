@@ -42,5 +42,8 @@ class API(object):
         _data = bytes(sqr_rd)
         data = self.encData(_data) + bytes([63, 151, 210, 246]) #last 4 bytes...
         headers["content-length"] = str(len(data))
-        print(self.req.post("https://gf.line.naver.jp/enc", data=data, headers=headers))
-        #todo decode res
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=headers)
+        
+        data = self.decData(res.content)
+        sqr = data[39:105]
+        return sqr.decode()
