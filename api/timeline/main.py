@@ -5,6 +5,26 @@ import json, time, base64
 class Timeline():
 
 
+    """ POST """
+
+    def listComment(self, mid, contentId):
+        params = {
+            'homeId': mid,
+            #'actorId': actorId,
+            'contentId': contentId,
+            #'limit': 10
+        }
+        hr = self.server.additionalHeaders(self.server.timelineHeaders, {
+            'x-lhm': "GET",
+            'Content-type': "application/json",
+            'x-lpv': '1',
+            'x-lsr':'TW'
+        })
+        url = self.server.urlEncode('https://gwz.line.naver.jp/mh', '/api/v52/comment/getList.json', params)
+        r = self.server.postContent(url, data=data, headers=hr)
+        return r.json()
+
+
     """ ALBUM """
 
     def changeGroupAlbumName(self, mid, albumId, name):

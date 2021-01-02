@@ -15,6 +15,8 @@ If you can help update this project, welcome to join our [Discord](https://disco
 ## Function overview
 - Keep Service
 - Timeline Service
+    - Post
+        - Comments
     - Album
 - OBS Service
     - uploadObjHome
@@ -23,3 +25,5 @@ If you can help update this project, welcome to join our [Discord](https://disco
 - 3rd Party
     - LINE WORKS
         - create account
+- Chrome API
+    - SQR (todo)
