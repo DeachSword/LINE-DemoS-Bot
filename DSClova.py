@@ -17,6 +17,14 @@ import requests, json
 class DSClova(object):
 
     def __init__(self, token, udid):
+        """
+        if u need the token
+        u can add DearSakura bot (Line ID: yinmo.dearsakura)
+        send .createqrcode
+        and enter clova
+        login the qrcode, u will get the token and udid
+        if failed, try again or report issue
+        """
         self.gwUrl = "https://clova-cic.line-apps.com/internal/v1/messenger-gw/"
         self.token = token
         self.udid = udid
