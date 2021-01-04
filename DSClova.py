@@ -93,11 +93,17 @@ class DSClova(object):
         return res
 
     def createLineGroupAndInviteFriends(self, sharedAccountBotId, groupName, inviteeIds):
-        # LINE Security Team
-        # If you know how to use it
-        # Please don't make it public
-        # !!! If you are using it for profit, LINE will demand compensation from you in December, and they are currently continuously reviewing the usage records !!!
-        return {}
+        # LINE Security Team will keep an eye on u
+        payload = {
+          "data": {
+            "groupName": groupName,
+            "inviteeIds": inviteeIds
+          },
+          "method": "POST",
+          "path": f"/v1/shared_accounts/{sharedAccountBotId}/group_invitation"
+        }
+        res = self._request.post(self.gwUrl, data=json.dumps(payload)).text
+        return res
 
     def deleteAccount(self, sharedAccountBotId):
         payload = {
