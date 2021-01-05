@@ -24,6 +24,24 @@ class Timeline():
         r = self.server.postContent(url, data=data, headers=hr)
         return r.json()
 
+    def searchNote(self, mid, text):
+        data = {
+           "query" : text,
+           "queryType" : "TEXT",
+           "homeId" : mid,
+           "postLimit" : 20,
+           "commandId" : 16,
+           "channelId" : "1341209850",
+           "commandType" : 188259
+        }
+        url = self.server.urlEncode(
+            'https://gwz.line.naver.jp/mh',
+            '/api/v46/search/note.json',
+            {}
+        )
+        r = self.server.postContent(url, headers=self.server.timelineHeaders, data=json.dumps(data))
+        res = r.json()
+        return res["result"]["feeds"]
 
     """ ALBUM """
 
