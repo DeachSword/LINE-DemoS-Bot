@@ -5,6 +5,20 @@ import json, time, base64
 class Timeline():
 
 
+    """ TIMELINE """
+    
+    def getProfileDetail(self, mid):
+        params = {
+            'homeId': mid
+        }
+        hr = self.server.additionalHeaders(self.server.timelineHeaders, {
+            'x-lhm': "GET",
+        })
+        url = self.server.urlEncode('https://ga2.line.naver.jp/hm', '/api/v1/home/cover.json', params)
+        r = self.server.postContent(url, headers=hr)
+        return r.json()
+
+
     """ POST """
 
     def listComment(self, mid, contentId):
@@ -21,7 +35,7 @@ class Timeline():
             'x-lsr':'TW'
         })
         url = self.server.urlEncode('https://gwz.line.naver.jp/mh', '/api/v52/comment/getList.json', params)
-        r = self.server.postContent(url, data=data, headers=hr)
+        r = self.server.postContent(url, headers=hr)
         return r.json()
 
     def searchNote(self, mid, text):
