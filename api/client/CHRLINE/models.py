@@ -3,6 +3,8 @@ from Crypto.Cipher import AES
 import Crypto.Cipher.PKCS1_OAEP as rsaenc
 from base64 import b64encode, b64decode
 from Crypto.Util.Padding import pad, unpad
+from hashlib import md5, sha1
+import xxhash
 
 class Models(object):
 
@@ -35,19 +37,17 @@ class Models(object):
         self._encryptKey = "0005" + b64encode(a.encrypt(self.encryptKey)).decode()
         
     def encData(self, data):
-        _data = self.cipher.encrypt(pad(data, AES.block_size))
-        return _data
-        #return _data + self.XQqwlHlXKK(self.encryptKey, _data)
+        _data = AES.new(self.encryptKey, AES.MODE_CBC, iv=self.IV).encrypt(pad(data, AES.block_size))
+        debug = []
+        return _data + self.XQqwlHlXKK(self.encryptKey, _data)
         
     def decData(self, data):
         data = pad(data, AES.block_size)
         _data = self.d_cipher.decrypt(data)
         i = 1
         data = self.yVdzCLDwMN(_data, i)
-        print(data)
         i = 3
         return _data
-        #return _data + self.XQqwlHlXKK(self.encryptKey, _data)
         
     def mFhrnmxnNF(self, t, e):
         i = 65536 
@@ -78,7 +78,7 @@ class Models(object):
         while i < n:
             _i = 0
             try:
-                _i = int(t[i:i + 2])
+                _i = int(t[i:i + 2], 16)
             except:
                 _i = 16
             e.append(_i);
@@ -88,22 +88,19 @@ class Models(object):
     def XQqwlHlXKK(self, e, i):
         r = []
         for o in range(16):
-            r[o] = 92 ^ ord(e[o])
-        
-        
-        
-        #n.update(new Uint8Array(r).buffer
+            r.append(92 ^ e[o])
+        n = xxhash.xxh32(b'',seed=0)
+        s = xxhash.xxh32(b'',seed=0)
+        n.update(bytes(r))
         for o in range(16):
             r[o] ^= 106
-        #s.update(new Uint8Array(r).buffer)
+        s.update(bytes(r))
         s.update(i)
-            
-
-        #var a = this.xZVpUuXFru(s.digest().toString(16));
-        #n.update(this.pmAWhahfKx(a).buffer);
-        #var c = this.xZVpUuXFru(n.digest().toString(16));
-        #return this.pmAWhahfKx(c)
-        #[35, 62, 236, 68]
+        a = s.hexdigest() # is b8a7c677?
+        n.update(bytes(self.pmAWhahfKx(a)))
+        c = n.hexdigest() # is 3f97d2f6?
+        d = self.pmAWhahfKx(c)
+        return bytes(d)
         
     def yVdzCLDwMN(self, d, i):
         return (255 & self.xnEmbaRWhy(d, i)) << 8 | 255 & self.xnEmbaRWhy(d, i+1)

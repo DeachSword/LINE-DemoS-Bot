@@ -18,6 +18,22 @@ class Timeline():
         r = self.server.postContent(url, headers=hr)
         return r.json()
 
+    @loggedIn
+    def updateProfileCoverById(self, objid, vObjid=None):
+        data = {
+            "homeId": self.profile.mid,
+            "coverObjectId": objid,
+            "storyShare": True,
+            "meta":{} # heh
+        }
+        if vObjid:
+            data['videoCoverObjectId'] = vObjid
+        hr = self.server.additionalHeaders(self.server.timelineHeaders, {
+            'x-lhm': "POST",
+        })
+        r = self.server.postContent('https://ga2.line.naver.jp/hm/api/v1/home/cover.json', headers=hr, data=json.dumps(data))
+        return r.json()
+
 
     """ POST """
 

@@ -15,6 +15,9 @@ If you can help update this project, welcome to join our [Discord](https://disco
 ## Function overview
 - Keep Service
 - Timeline Service
+    - Timeline
+        - getProfileDetail
+        - updateProfileCoverById
     - Post
         - Comments
         - Search
@@ -27,4 +30,4 @@ If you can help update this project, welcome to join our [Discord](https://disco
     - LINE WORKS
         - create account
 - Chrome API
-    - SQR (todo)
+    - SQR 
