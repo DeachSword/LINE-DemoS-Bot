@@ -43,7 +43,7 @@ class Models(object):
         
     def decData(self, data):
         data = pad(data, AES.block_size)
-        _data = self.d_cipher.decrypt(data)
+        _data = AES.new(self.encryptKey, AES.MODE_CBC, iv=self.IV).decrypt(data)
         i = 1
         data = self.yVdzCLDwMN(_data, i)
         i = 3
@@ -111,4 +111,39 @@ class Models(object):
         if t > 127:
             t = 0 - (t - 1 ^ 255)
         return t
-            
+        
+    def tryReadData(self, data):
+        _data = {}
+        if data[4] == 128:
+            a = 12 + data[11]
+            b = data[12:a].decode()
+            _data[b] = {}
+            c = data[a + 4]
+            if c == 11:
+                d = data[a + 10]
+                e = data[a + 11:a + 11 + d].decode()
+                _data[b] = e
+            elif c == 12:
+                _data[b] = self.readContainerStruct(data[a + 7:])
+        return _data
+        
+    def readContainerStruct(self, data):
+        _data = []
+        nextPos = 0
+        if data[0] == 2:
+            a = data[3]
+            _data.append(a)
+            nextPos = 8
+        elif data[0] == 11:
+            a = int.from_bytes(data[5:7], "big")
+            b = data[7:a+7]
+            _data.append(b.decode())
+            nextPos = a + 7
+        else:
+            print(f"[readContainerStruct]不支援Type: {data[0]}")
+        if _data and nextPos > 0:
+            data = data[nextPos:]
+            c = self.readContainerStruct(data)
+            if c:
+                _data += c
+        return _data

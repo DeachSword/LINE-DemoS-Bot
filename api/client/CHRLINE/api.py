@@ -180,12 +180,12 @@ class API(object):
         data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
-        return data[43:75].decode()
+        return self.tryReadData(data)
         
     def getProfile(self, token):
         _headers = {
             'X-Line-Access': token, 
-            'x-lpqs': "/S3"
+            'x-lpqs': "/S2"
         }
         a = self.encHeaders(_headers)
         sqrd = [128, 1, 0, 1, 0, 0, 0, 10, 103, 101, 116, 80, 114, 111, 102, 105, 108, 101, 0, 0, 0, 0, 0]
@@ -194,7 +194,7 @@ class API(object):
         data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
-        return bytes(data)
+        return self.tryReadData(data)
         
     def getSettings(self, token):
         _headers = {
@@ -208,7 +208,7 @@ class API(object):
         data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
-        return bytes(data)
+        return self.tryReadData(data)
         
     def issueChannelToken(self, token):
         _headers = {
@@ -224,4 +224,4 @@ class API(object):
         data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
-        return data[43:407].decode()
+        return self.tryReadData(data)
