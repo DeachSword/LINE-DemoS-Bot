@@ -180,7 +180,7 @@ class API(object):
         data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
-        return bytes(data)
+        return data[43:75].decode()
         
     def getProfile(self, token):
         _headers = {
@@ -224,5 +224,4 @@ class API(object):
         data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
-        return bytes(data)
-        
+        return data[43:407].decode()

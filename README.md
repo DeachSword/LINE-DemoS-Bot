@@ -31,3 +31,6 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - create account
 - Chrome API
     - SQR 
+    - Services
+        - getEncryptedIdentity
+        - issueChannelToken
