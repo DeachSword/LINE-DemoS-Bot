@@ -225,3 +225,25 @@ class API(object):
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
         return self.tryReadData(data)
+        
+    def testFunc(self, token, path, funcName, funcValue=None, funcValueId=1):
+        _headers = {
+            'X-Line-Access': token, 
+            'x-lpqs': path
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, len(funcName)]
+        for name in funcName:
+            sqrd.append(ord(name))
+        sqrd += [0, 0, 0, 0]
+        if funcValue:
+            sqrd += [11, 0, funcValueId, 0, 0, 0, len(funcValue)]
+            for value in funcValue: # string only
+                sqrd.append(ord(value))
+        sqrd += [0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
