@@ -11,6 +11,10 @@ class CHRLINE(Models, API, Thrift):
         self.headers['x-line-application'] = "%s\t%s\t%s\t%s" % (device, version, os_name, os_ver)
         if authToken:
             self.authToken = authToken
+            self.profile = self.getProfile()['getProfile']
+            if 'error' in self.profile:
+                raise Exception(f"登入失敗... {self.profile['error']}")
+            print(f"[{self.profile[20]}] 登入成功 ({self.profile[1]})")
         else:
             self.requestSQR(device, version, os_name, os_ver)
        

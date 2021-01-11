@@ -34,3 +34,19 @@ If you can help update this project, welcome to join our [Discord](https://disco
     - Services
         - getEncryptedIdentity
         - issueChannelToken
+        - getChannelInfo
+        - getContact
+        - getContacts (todo)
+        - getGroup (todo)
+        - getGroups (todo)
+        - getCompactGroup (todo)
+        - sendMessage (todo)
+        - getGroupIdsJoined
+        - getGroupIdsInvited
+        - getAllContactIds
+        - getBlockedContactIds
+        - getBlockedRecommendationIds
+        - getAllReadMessageOps
+        - getLastOpRevision
+        - getServerTime
+        - getConfigurations

@@ -121,21 +121,33 @@ class Models(object):
             c = data[a + 4]
             id = data[a + 6]
             if id == 0:
-                if c == 11:
+                if c == 10:
+                    a = int.from_bytes(data[a + 9:a + 15], "big")
+                    _data[b] = a
+                elif c == 11:
                     d = data[a + 10]
                     e = data[a + 11:a + 11 + d].decode()
                     _data[b] = e
                 elif c == 12:
                     _data[b] = self.readContainerStruct(data[a + 7:])
                 elif c == 15:
+                    type = data[a + 7]
                     d = data[a + 11]
                     _data[b] = []
-                    e = a + 7
+                    e = a + 15
                     for _d in range(d):
-                        f = self.readContainerStruct(data[e:], True)
-                        _data[b].append(f[0])
-                        e += f[1]
-                        
+                        if type == 11:
+                            f = data[e]
+                            _data[b].append(data[e+1:e+1+f].decode())
+                            e += f + 4
+                        elif type == 12:
+                            #print(data.hex())
+                            f = self.readContainerStruct(data[a + 12:], True)
+                            print(f)
+                            _data[b].append(f[0])
+                            e += f[1] + a + 12
+                        else:
+                            print(f"[tryReadData_LIST(15)]不支援Type: {type}")
                 else:
                     print(f"[tryReadData]不支援Type: {c} => ID: {id}")
             else:
@@ -161,7 +173,7 @@ class Models(object):
                 _data[id] = True
             else:
                  _data[id] = False
-            nextPos = 8
+            nextPos = 4
         elif data[0] == 8:
             a = int.from_bytes(data[3:6], "big")
             _data[id] = a
@@ -191,13 +203,18 @@ class Models(object):
             if b != 0:
                 for d in range(b):
                     e = data[c] # key len
-                    f = c + 1 + e
-                    g = data[f + 3] # value len
+                    f = c + e
+                    if data[3] == 8:
+                        f = c + 1
+                        g = data[c + 4]
+                        _key = data[c]
+                    else:
+                        g = data[f + 3] # value len
+                        _key = data[c:f].decode()
                     h = f + 4 + g
-                    _key = data[c+1:f].decode()
                     _value = data[f + 4:h].decode()
                     _d[_key] = _value
-                    c = h + 3
+                    c = h # ??
                 _data[id] = _d
                 nextPos = h
         else:
