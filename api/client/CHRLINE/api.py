@@ -15,12 +15,14 @@ class API(object):
             "x-lst": "300000000",
             "x-lal": "zh_TW",
         }
+        self.authToken = None
 
-    def requestSQR(self):
+    def requestSQR(self, device="CHROMEOS", version="2.4.1", os_name="Chrome_OS", os_ver="1"):
         _headers = {
             "x-lpqs": "/acct/lgn/sq/v1"
         }
         a = self.encHeaders(_headers)
+        self.headers['x-line-application'] = "%s\t%s\t%s\t%s" % (device, version, os_name, os_ver)
         sqrd = [128, 1, 0, 1, 0, 0, 0, 13, 99, 114, 101, 97, 116, 101, 83, 101, 115, 115, 105, 111, 110, 0, 0, 0, 0, 12, 0, 1, 0, 0]
         sqr_rd = a + sqrd
         _data = bytes(sqr_rd)
@@ -36,8 +38,9 @@ class API(object):
             c = self.createPinCode(sqr)
             print(f"請輸入pincode: {c}")
             if self.checkPinCodeVerified(sqr):
-                e = self.qrCodeLogin(sqr)
-                return e.decode()
+                e = self.qrCodeLogin(sqr, device)
+                self.authToken = e.decode()
+                return self.authToken
         return False
         
     def createSession(self, qrcode):
@@ -126,7 +129,7 @@ class API(object):
             return True
         return False
         
-    def qrCodeLogin(self, qrcode):
+    def qrCodeLogin(self, qrcode, deviceos="CHROMEOS"):
         _headers = {
             "x-lpqs": "/acct/lgn/sq/v1"
         }
@@ -134,8 +137,8 @@ class API(object):
         sqrd = [128, 1, 0, 1, 0, 0, 0, 11, 113, 114, 67, 111, 100, 101, 76, 111, 103, 105, 110, 0, 0, 0, 0, 12, 0, 1, 11, 0, 1, 0, 0, 0, 66]
         for qr in qrcode:
             sqrd.append(ord(qr))
-        sqrd += [11, 0, 2, 0, 0, 0, 8]
-        for device in 'CHROMEOS':
+        sqrd += [11, 0, 2, 0, 0, 0, len(deviceos)]
+        for device in deviceos:
             sqrd.append(ord(device))
         sqrd += [2, 0, 3, 0, 0, 0]
         sqr_rd = a + sqrd
@@ -144,7 +147,7 @@ class API(object):
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
         pem = data[36:101] #64dig?
-        print("證書: ", pem)
+        print("證書: ", pem.decode())
         _token = data[108:]
         return bytes(_token[:88]) # 88dig?
         token = []
@@ -154,9 +157,9 @@ class API(object):
                 break
         return bytes(token)
         
-    def CPF(self, token):
+    def CPF(self):
         _headers = {
-            'X-Line-Access': token, 
+            'X-Line-Access': self.authToken, 
             'x-lpqs': "/CPF"
         }
         a = self.encHeaders(_headers)
@@ -168,9 +171,9 @@ class API(object):
         data = self.decData(res.content)
         return bytes(data)
         
-    def getEncryptedIdentity(self, token):
+    def getEncryptedIdentity(self):
         _headers = {
-            'X-Line-Access': token, 
+            'X-Line-Access': self.authToken, 
             'x-lpqs': "/S3"
         }
         a = self.encHeaders(_headers)
@@ -182,9 +185,9 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
-    def getProfile(self, token):
+    def getProfile(self):
         _headers = {
-            'X-Line-Access': token, 
+            'X-Line-Access': self.authToken, 
             'x-lpqs': "/S2"
         }
         a = self.encHeaders(_headers)
@@ -196,9 +199,9 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
-    def getSettings(self, token):
+    def getSettings(self):
         _headers = {
-            'X-Line-Access': token, 
+            'X-Line-Access': self.authToken, 
             'x-lpqs': "/S3"
         }
         a = self.encHeaders(_headers)
@@ -210,9 +213,9 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
-    def issueChannelToken(self, token):
+    def issueChannelToken(self):
         _headers = {
-            'X-Line-Access': token, 
+            'X-Line-Access': self.authToken, 
             'x-lpqs': "/CH3"
         }
         a = self.encHeaders(_headers)
@@ -226,9 +229,70 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
-    def testFunc(self, token, path, funcName, funcValue=None, funcValueId=1):
+    def getContact(self, mid):
         _headers = {
-            'X-Line-Access': token, 
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 10, 103, 101, 116, 67, 111, 110, 116, 97, 99, 116, 0, 0, 0, 0, 11, 0, 2, 0, 0, 0, 33]
+        for value in mid:
+            sqrd.append(ord(value))
+        sqrd += [0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
+    def getContacts(self, mids):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 11, 103, 101, 116, 67, 111, 110, 116, 97, 99, 116, 115, 0, 0, 0, 0, 15, 0, 2, 11, 0, 0, 0, len(mids)]
+        for mid in mids:
+            sqrd += [0, 0, 0, 33]
+            for value in mid:
+                sqrd.append(ord(value))
+        sqrd += [0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
+    def sendMessage(self, to, text):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 11, 115, 101, 110, 100, 77, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 11, 0, 2, 0, 0, 0, 33]
+        #2:self.to
+        #4:self.id
+        #10:self.text
+        #15:self.contentType
+        for value in to:
+            sqrd.append(ord(value))
+        sqrd += [11, 0, 10, 0, 0, 0, len(text)]
+        for value in text:
+            sqrd.append(ord(value))
+        sqrd += [8, 0, 15, 0, 0, 0, 0]
+        sqrd += [0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
+    def testFunc(self, path, funcName, funcValue=None, funcValueId=1):
+        _headers = {
+            'X-Line-Access': self.authToken, 
             'x-lpqs': path
         }
         a = self.encHeaders(_headers)
@@ -236,6 +300,7 @@ class API(object):
         for name in funcName:
             sqrd.append(ord(name))
         sqrd += [0, 0, 0, 0]
+        print(sqrd)
         if funcValue:
             sqrd += [11, 0, funcValueId, 0, 0, 0, len(funcValue)]
             for value in funcValue: # string only

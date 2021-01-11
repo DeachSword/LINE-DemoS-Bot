@@ -127,16 +127,33 @@ class Models(object):
                     _data[b] = e
                 elif c == 12:
                     _data[b] = self.readContainerStruct(data[a + 7:])
+                elif c == 15:
+                    d = data[a + 11]
+                    _data[b] = []
+                    e = a + 7
+                    for _d in range(d):
+                        f = self.readContainerStruct(data[e:], True)
+                        _data[b].append(f[0])
+                        e += f[1]
+                        
+                else:
+                    print(f"[tryReadData]不支援Type: {c} => ID: {id}")
             else:
-                t_l = data[a + 20]
+                if c == 11:
+                    t_l = data[a + 10]
+                    error = data[a + 11:a + 11 + t_l].decode()
+                else:
+                    t_l = data[a + 20]
+                    error = data[a + 21:a + 21 + t_l].decode()
                 _data[b] = {
-                    "error": data[a + 21:a + 21 + t_l].decode()
+                    "error": error
                 }
         return _data
         
     def readContainerStruct(self, data, get_data_len=False):
         _data = {}
         nextPos = 0
+        _nextPos = 0
         id = data[2]
         if data[0] == 2:
             a = data[3]
@@ -145,6 +162,10 @@ class Models(object):
             else:
                  _data[id] = False
             nextPos = 8
+        elif data[0] == 8:
+            a = int.from_bytes(data[3:6], "big")
+            _data[id] = a
+            nextPos = 7
         elif data[0] == 10:
             a = int.from_bytes(data[4:11], "big")
             _data[id] = a
@@ -155,7 +176,7 @@ class Models(object):
             _data[id] = b.decode()
             nextPos = a + 7
         elif data[0] == 12:
-            a = self.readContainerStruct(data[3:], True)
+            a = self.readContainerStruct(data[5:], True)
             print(a) # 解決 nextPos ?
             _data[id] = a[0]
             #nextPos = 3 + a[1]
@@ -167,17 +188,18 @@ class Models(object):
             b = data[8] # count
             c = 12
             _d = {}
-            for d in range(b):
-                e = data[c] # key len
-                f = c + 1 + e
-                g = data[f + 3] # value len
-                h = f + 4 + g
-                _key = data[c+1:f].decode()
-                _value = data[f + 4:h].decode()
-                _d[_key] = _value
-                c = h + 3
-            _data[id] = _d
-            nextPos = h
+            if b != 0:
+                for d in range(b):
+                    e = data[c] # key len
+                    f = c + 1 + e
+                    g = data[f + 3] # value len
+                    h = f + 4 + g
+                    _key = data[c+1:f].decode()
+                    _value = data[f + 4:h].decode()
+                    _d[_key] = _value
+                    c = h + 3
+                _data[id] = _d
+                nextPos = h
         else:
             print(f"[readContainerStruct]不支援Type: {data[0]} => ID: {id}")
         if _data and nextPos > 0:
