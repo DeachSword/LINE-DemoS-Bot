@@ -36,10 +36,10 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - issueChannelToken
         - getChannelInfo
         - getContact
-        - getContacts (todo)
-        - getGroup (todo)
-        - getGroups (todo)
-        - getCompactGroup (todo)
+        - getContacts
+        - getGroup
+        - getGroups
+        - getCompactGroup
         - sendMessage (text only)
         - getGroupIdsJoined
         - getGroupIdsInvited
@@ -50,3 +50,5 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - getLastOpRevision
         - getServerTime
         - getConfigurations
+        - fetchOps
+        - deleteOtherFromChat

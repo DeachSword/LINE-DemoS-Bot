@@ -336,6 +336,29 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
+    def deleteOtherFromChat(self, to, mid):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 19, 100, 101, 108, 101, 116, 101, 79, 116, 104, 101, 114, 70, 114, 111, 109, 67, 104, 97, 116, 0, 0, 0, 0]
+        sqrd += [12, 0, 1]
+        sqrd += [8, 0, 1, 0, 0, 0, 0] # seq?
+        sqrd += [11, 0, 2, 0, 0, 0, len(to)]
+        for value in to:
+            sqrd.append(ord(value))
+        sqrd += [14, 0, 3, 11, 0, 0, 0, 1, 0, 0, 0, len(mid)]
+        for value in mid:
+            sqrd.append(ord(value))
+        sqrd += [0, 0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
     def sendMessage(self, to, text):
         _headers = {
             'X-Line-Access': self.authToken, 
@@ -490,6 +513,25 @@ class API(object):
         }
         a = self.encHeaders(_headers)
         sqrd = [128, 1, 0, 1, 0, 0, 0, 17, 103, 101, 116, 67, 111, 110, 102, 105, 103, 117, 114, 97, 116, 105, 111, 110, 115, 0, 0, 0, 0, 0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
+    def fetchOps(self, revision, count=500, globalRev=0, individualRev=0):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/P3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 8, 102, 101, 116, 99, 104, 79, 112, 115, 0, 0, 0, 0]
+        sqrd += [10, 0, 2] + self.getIntBytes(revision, 8)
+        sqrd += [8, 0, 3] + self.getIntBytes(count)
+        sqrd += [10, 0, 4] + self.getIntBytes(globalRev, 8)
+        sqrd += [10, 0, 5] + self.getIntBytes(individualRev, 8)
+        sqrd += [0]
         sqr_rd = a + sqrd
         _data = bytes(sqr_rd)
         data = self.encData(_data)
