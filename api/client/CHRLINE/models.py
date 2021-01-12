@@ -150,7 +150,7 @@ class Models(object):
                         elif type == 12:
                             f = self.readContainerStruct(data[a + 12:], True)
                             _data[b].append(f[0])
-                            e += f[1] + a + 12
+                            a += f[1] + 2
                         else:
                             print(f"[tryReadData_LIST(15)]不支援Type: {type}")
                 else:
@@ -180,7 +180,7 @@ class Models(object):
                  _data[id] = False
             nextPos = 4
         elif data[0] == 8:
-            a = int.from_bytes(data[3:6], "big")
+            a = int.from_bytes(data[3:7], "big")
             _data[id] = a
             nextPos = 7
         elif data[0] == 10:
@@ -233,15 +233,17 @@ class Models(object):
             e = 8
             for _d in range(d):
                 if type == 11:
+                    # 0F 00 28 0B 00 00 00 1B 00 00 00 21
                     f = data[e]
                     _data[id].append(data[e+1:e+1+f].decode())
                     e += f + 4
                 elif type == 12:
                     f = self.readContainerStruct(data[e:], True)
                     _data[id].append(f[0])
-                    e += f[1] + 8
+                    e += f[1] + 9
                 else:
                     print(f"[readContainerStruct_LIST(15)]不支援Type: {type}")
+            nextPos += e + 1
         elif not get_data_len:
             print(f"[readContainerStruct]不支援Type: {data[0]} => ID: {id}")
         if _data and nextPos > 0:

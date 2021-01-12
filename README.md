@@ -40,6 +40,7 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - getGroup
         - getGroups
         - getCompactGroup
+        - getChats (test)
         - sendMessage (text only)
         - getGroupIdsJoined
         - getGroupIdsInvited
@@ -52,3 +53,4 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - getConfigurations
         - fetchOps
         - deleteOtherFromChat
+        - cancelChatInvitation
