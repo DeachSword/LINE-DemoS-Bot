@@ -2,11 +2,12 @@
 import requests
 
 class API(object):
-
+    _msgSeq = 0
+    
     def __init__(self):
         self.req = requests.session()
         self.headers = {
-            "x-line-application": "CHROMEOS\t2.4.1\tChrome_OS\t1",
+            "x-line-application": self.APP_NAME,
             "x-lhm": "POST",
             "x-le": "18",
             "x-lcs": self._encryptKey,
@@ -17,12 +18,11 @@ class API(object):
         }
         self.authToken = None
 
-    def requestSQR(self, device="CHROMEOS", version="2.4.1", os_name="Chrome_OS", os_ver="1"):
+    def requestSQR(self):
         _headers = {
             "x-lpqs": "/acct/lgn/sq/v1"
         }
         a = self.encHeaders(_headers)
-        self.headers['x-line-application'] = "%s\t%s\t%s\t%s" % (device, version, os_name, os_ver)
         sqrd = [128, 1, 0, 1, 0, 0, 0, 13, 99, 114, 101, 97, 116, 101, 83, 101, 115, 115, 105, 111, 110, 0, 0, 0, 0, 12, 0, 1, 0, 0]
         sqr_rd = a + sqrd
         _data = bytes(sqr_rd)
@@ -342,18 +342,27 @@ class API(object):
             'x-lpqs': "/S3"
         }
         a = self.encHeaders(_headers)
-        sqrd = [128, 1, 0, 1, 0, 0, 0, 11, 115, 101, 110, 100, 77, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 11, 0, 2, 0, 0, 0, 33]
-        #2:self.to
-        #4:self.id
-        #10:self.text
-        #15:self.contentType
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 11, 115, 101, 110, 100, 77, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 8, 0, 1]
+        sqrd += self.getIntBytes(self._msgSeq)
+        sqrd += [12, 0, 2, 11, 0, 1, 0, 0, 0, len(self.profile[1])]
+        for value in self.profile[1]:
+            sqrd.append(ord(value))
+        sqrd += [11, 0, 2, 0, 0, 0, len(to)]
         for value in to:
             sqrd.append(ord(value))
-        sqrd += [11, 0, 10, 0, 0, 0, len(text)]
-        for value in text:
-            sqrd.append(ord(value))
-        sqrd += [8, 0, 15, 0, 0, 0, 0]
-        sqrd += [0]
+        sqrd += [8, 0, 3]
+        _toType = (2).to_bytes(4, byteorder="big")
+        for value in _toType:
+            sqrd.append(value)
+        sqrd += [11, 0, 4, 0, 0, 0, 0]
+        sqrd += [10, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0] # createTime
+        text = str(text)
+        sqrd += [11, 0, 10] + self.getIntBytes(len(text))
+        for value2 in text:
+            sqrd.append(ord(value2))
+        sqrd += [2, 0, 14, 0] # hasContent
+        sqrd += [8, 0, 15, 0, 0, 0, 0] # contentType
+        sqrd += [0, 0]
         sqr_rd = a + sqrd
         _data = bytes(sqr_rd)
         data = self.encData(_data)

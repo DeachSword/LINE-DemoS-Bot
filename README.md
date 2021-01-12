@@ -40,7 +40,7 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - getGroup (todo)
         - getGroups (todo)
         - getCompactGroup (todo)
-        - sendMessage (todo)
+        - sendMessage (text only)
         - getGroupIdsJoined
         - getGroupIdsInvited
         - getAllContactIds
