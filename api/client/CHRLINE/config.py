@@ -44,6 +44,7 @@ class Config(object):
         self.USER_AGENT = 'Line/%s' % self.APP_VER
     
     def initAppConfig(self, app_type, app_version, os_name, os_version):
+        self.APP_TYPE = "CHROMEOS"
         if app_type is not None:
             self.APP_TYPE = app_type
         if app_version is not None:

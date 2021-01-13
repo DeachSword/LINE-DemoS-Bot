@@ -18,7 +18,8 @@ class CHRLINE(Models, API, Thrift, Config):
                 raise Exception(f"登入失敗... {self.profile['error']}")
             print(f"[{self.profile[20]}] 登入成功 ({self.profile[1]})")
         else:
-            self.requestSQR(device, version, os_name, os_ver)
+            self.authToken = self.requestSQR()
+            print(f"AuthToken: {self.authToken}")
        
 
     def initAll(self):

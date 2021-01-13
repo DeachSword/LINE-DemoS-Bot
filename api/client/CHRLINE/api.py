@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import requests
-from struct import pack
 
 class API(object):
     _msgSeq = 0
@@ -39,7 +38,7 @@ class API(object):
             c = self.createPinCode(sqr)
             print(f"請輸入pincode: {c}")
             if self.checkPinCodeVerified(sqr):
-                e = self.qrCodeLogin(sqr, device)
+                e = self.qrCodeLogin(sqr)
                 self.authToken = e.decode()
                 return self.authToken
         return False
@@ -130,7 +129,7 @@ class API(object):
             return True
         return False
         
-    def qrCodeLogin(self, qrcode, deviceos="CHROMEOS"):
+    def qrCodeLogin(self, qrcode):
         _headers = {
             "x-lpqs": "/acct/lgn/sq/v1"
         }
@@ -138,8 +137,8 @@ class API(object):
         sqrd = [128, 1, 0, 1, 0, 0, 0, 11, 113, 114, 67, 111, 100, 101, 76, 111, 103, 105, 110, 0, 0, 0, 0, 12, 0, 1, 11, 0, 1, 0, 0, 0, 66]
         for qr in qrcode:
             sqrd.append(ord(qr))
-        sqrd += [11, 0, 2, 0, 0, 0, len(deviceos)]
-        for device in deviceos:
+        sqrd += [11, 0, 2, 0, 0, 0, len(self.APP_TYPE)]
+        for device in self.APP_TYPE:
             sqrd.append(ord(device))
         sqrd += [2, 0, 3, 0, 0, 0]
         sqr_rd = a + sqrd
@@ -421,6 +420,29 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
+    def acceptChatInvitation(self, to, mid):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 20, 97, 99, 99, 101, 112, 116, 67, 104, 97, 116, 73, 110, 118, 105, 116, 97, 116, 105, 111, 110, 0, 0, 0, 0]
+        sqrd += [12, 0, 1]
+        sqrd += [8, 0, 1, 0, 0, 0, 0] # seq?
+        sqrd += [11, 0, 2, 0, 0, 0, len(to)]
+        for value in to:
+            sqrd.append(ord(value))
+        sqrd += [14, 0, 3, 11, 0, 0, 0, 1, 0, 0, 0, len(mid)]
+        for value in mid:
+            sqrd.append(ord(value))
+        sqrd += [0, 0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
     def sendMessage(self, to, text):
         _headers = {
             'X-Line-Access': self.authToken, 
@@ -436,7 +458,15 @@ class API(object):
         for value in to:
             sqrd.append(ord(value))
         sqrd += [8, 0, 3]
-        _toType = (2).to_bytes(4, byteorder="big")
+        if to[0] == 'u':
+            toType = 0
+        elif to[0] == 'r':
+            toType = 1
+        elif to[0] == 'c':
+            toType = 2
+        else:
+            raise Exception(f"未知的toType: {to[0]}")
+        _toType = (toType).to_bytes(4, byteorder="big")
         for value in _toType:
             sqrd.append(value)
         sqrd += [11, 0, 4, 0, 0, 0, 0]
@@ -447,6 +477,9 @@ class API(object):
             sqrd.append(value2)
         sqrd += [2, 0, 14, 0] # hasContent
         sqrd += [8, 0, 15, 0, 0, 0, 0] # contentType
+        # 18 contentMetadata
+        # 21 reply msg id
+        # 22 reply type : 2 ?
         sqrd += [0, 0]
         sqr_rd = a + sqrd
         _data = bytes(sqr_rd)
