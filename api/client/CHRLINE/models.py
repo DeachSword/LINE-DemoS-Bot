@@ -160,17 +160,22 @@ class Models(object):
                     t_l = data[a + 10]
                     error = data[a + 11:a + 11 + t_l].decode()
                 else:
+                    code = data[a + 10:a + 14]
                     t_l = data[a + 20]
-                    error = data[a + 21:a + 21 + t_l].decode()
+                    error = {
+                        'code': int.from_bytes(code, "big"),
+                        'message': data[a + 21:a + 21 + t_l].decode()
+                    }
                 _data[b] = {
                     "error": error
                 }
+                print(_data)
         return _data
         
     def readContainerStruct(self, data, get_data_len=False):
         _data = {}
         nextPos = 0
-        _nextPos = 0
+        dataType = data[0]
         id = data[2]
         if data[0] == 2:
             a = data[3]
@@ -188,13 +193,16 @@ class Models(object):
             _data[id] = a
             nextPos = 11
         elif data[0] == 11:
-            a = int.from_bytes(data[6:7], "big")
+            a = int.from_bytes(data[5:7], "big")
             if a == 0:
                 _data[id] = ''
                 nextPos = a + 7
             else:
                 b = data[7:a+7]
-                _data[id] = b.decode()
+                try:
+                    _data[id] = b.decode()
+                except:
+                    _data[id] = b
                 nextPos = a + 7
         elif data[0] == 12:
             a = self.readContainerStruct(data[3:], True)
@@ -202,7 +210,7 @@ class Models(object):
             _data[id] = a[0]
             nextPos = a[1] + 4
         elif data[0] == 13:
-            # list? dict?
+            # dict
             # 0D 00 24 0B 0B 00 00 00 02 00 00 00 07
             # what is 24?
             a = data[4] # value type? todo it?
@@ -217,15 +225,28 @@ class Models(object):
                         f = c + 1
                         g = data[c + 4]
                         _key = data[c]
+                        h = f + 4 + g
+                        _value = data[f + 4:h].decode()
+                        c = h # ??
                     else:
-                        g = data[f + 3] # value len
-                        _key = data[c:f].decode()
-                    h = f + 4 + g
-                    _value = data[f + 4:h].decode()
+                        g = data[f + 4] # value len
+                        _key = data[c + 1:f + 1].decode()
+                        h = f + g + 5
+                        if a == 12:
+                            __value = self.readContainerStruct(data[f+1:], True)
+                            _value = __value[0]
+                            h = f + __value[1]
+                            c = h
+                        else:
+                            _value = data[f + 5:h].decode()
+                            c = h + 3 # ??
                     _d[_key] = _value
-                    c = h # ??
                 _data[id] = _d
-                nextPos = h
+                nextPos = c
+            else:
+                nextPos = 9
+                _data[id] = {}
+                print(data[nextPos:].hex())
         elif data[0] == 15:
             type = data[3]
             d = data[7]
@@ -233,25 +254,29 @@ class Models(object):
             e = 8
             for _d in range(d):
                 if type == 11:
-                    # 0F 00 28 0B 00 00 00 1B 00 00 00 21
-                    f = data[e]
-                    _data[id].append(data[e+1:e+1+f].decode())
+                    f = data[e+3]
+                    _data[id].append(data[e+4:e+4+f].decode())
                     e += f + 4
                 elif type == 12:
                     f = self.readContainerStruct(data[e:], True)
                     _data[id].append(f[0])
-                    e += f[1] + 9
+                    if f[2] in [12, 13]:
+                        e += f[1] + 1
+                    else:
+                        e += f[1] + 10
                 else:
                     print(f"[readContainerStruct_LIST(15)]不支援Type: {type}")
             nextPos += e + 1
-        elif not get_data_len:
+        else:
             print(f"[readContainerStruct]不支援Type: {data[0]} => ID: {id}")
-        if _data and nextPos > 0:
+        if nextPos > 0:
             data = data[nextPos:]
             c = self.readContainerStruct(data, True)
             if c[0]:
                 _data.update(c[0])
                 nextPos += c[1] # lol, why i forget it
+                if c[2] != 0:
+                    dataType = c[2]
         if get_data_len:
-            return [_data, nextPos]
+            return [_data, nextPos, dataType]
         return _data

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import requests
+import requests, time
 
 class API(object):
     _msgSeq = 0
@@ -283,6 +283,29 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
+    def getContactsV2(self, mids):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 13, 103, 101, 116, 67, 111, 110, 116, 97, 99, 116, 115, 86, 50, 0, 0, 0, 0]
+        sqrd += [12, 0, 1]
+        sqrd += [15, 0, 1, 11, 0, 0, 0, len(mids)]
+        for mid in mids:
+            sqrd += [0, 0, 0, 33]
+            for value in mid:
+                sqrd.append(ord(value))
+        sqrd += [0, 0]
+        
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
     def getGroup(self, mid):
         _headers = {
             'X-Line-Access': self.authToken, 
@@ -344,12 +367,17 @@ class API(object):
             'x-lpqs': "/S3"
         }
         a = self.encHeaders(_headers)
-        sqrd = [128, 1, 0, 1, 0, 0, 0, 8, 103, 101, 116, 67, 104, 97, 116, 115, 0, 0, 0, 0, 15, 0, 2, 11, 0, 0, 0, len(mids)]
+        
+        
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 8, 103, 101, 116, 67, 104, 97, 116, 115, 0, 0, 0, 0]
+        sqrd += [12, 0, 1]
+        sqrd += [15, 0, 1, 11, 0, 0, 0, len(mids)]
         for mid in mids:
             sqrd += [0, 0, 0, 33]
             for value in mid:
                 sqrd.append(ord(value))
-        sqrd += [0]
+        sqrd += [0, 0]
+        
         sqr_rd = a + sqrd
         _data = bytes(sqr_rd)
         data = self.encData(_data)
@@ -397,6 +425,31 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
+    def inviteChatInvitation(self, to, mids):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 20, 105, 110, 118, 105, 116, 101, 67, 104, 97, 116, 73, 110, 118, 105, 116, 97, 116, 105, 111, 110, 0, 0, 0, 0]
+        sqrd += [12, 0, 1]
+        sqrd += [8, 0, 1, 0, 0, 0, 0]
+        sqrd += [11, 0, 2, 0, 0, 0, len(to)]
+        for value in to:
+            sqrd.append(ord(value))
+        sqrd += [14, 0, 3, 11, 0, 0, 0, len(mids)]
+        for mid in mids:
+            sqrd += [0, 0, 0, 33]
+            for value in mid:
+                sqrd.append(ord(value))
+        sqrd += [0, 0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
     def cancelChatInvitation(self, to, mid):
         _headers = {
             'X-Line-Access': self.authToken, 
@@ -420,7 +473,7 @@ class API(object):
         data = self.decData(res.content)
         return self.tryReadData(data)
         
-    def acceptChatInvitation(self, to, mid):
+    def acceptChatInvitation(self, to):
         _headers = {
             'X-Line-Access': self.authToken, 
             'x-lpqs': "/S3"
@@ -432,8 +485,29 @@ class API(object):
         sqrd += [11, 0, 2, 0, 0, 0, len(to)]
         for value in to:
             sqrd.append(ord(value))
-        sqrd += [14, 0, 3, 11, 0, 0, 0, 1, 0, 0, 0, len(mid)]
-        for value in mid:
+        sqrd += [0, 0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        self.sendMessage(to, 'Power by CHRLINE API')
+        return self.tryReadData(data)
+        
+    def acceptChatInvitationByTicket(self, to, ticket):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 20, 97, 99, 99, 101, 112, 116, 67, 104, 97, 116, 73, 110, 118, 105, 116, 97, 116, 105, 111, 110, 0, 0, 0, 0]
+        sqrd += [12, 0, 1]
+        sqrd += [8, 0, 1, 0, 0, 0, 0]
+        sqrd += [11, 0, 2, 0, 0, 0, len(to)]
+        for value in to:
+            sqrd.append(ord(value))
+        sqrd += [11, 0, 3, 0, 0, 0, len(ticket)]
+        for value in ticket:
             sqrd.append(ord(value))
         sqrd += [0, 0]
         sqr_rd = a + sqrd
@@ -569,6 +643,33 @@ class API(object):
         _data = bytes(sqr_rd)
         data = self.encData(_data)
         print('Korone is my wife :p')
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return self.tryReadData(data)
+        
+    def getPreviousMessagesV2WithRequest(self, messageBoxId, endMessageId=0, messagesCount=0, withReadCount=0, receivedOnly=False):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/S3"
+        }
+        a = self.encHeaders(_headers)
+        sqrd = [128, 1, 0, 1, 0, 0, 0, 32, 103, 101, 116, 80, 114, 101, 118, 105, 111, 117, 115, 77, 101, 115, 115, 97, 103, 101, 115, 86, 50, 87, 105, 116, 104, 82, 101, 113, 117, 101, 115, 116, 0, 0, 0, 0]
+        sqrd += [12, 0, 2]
+        sqrd += [11, 0, 1, 0, 0, 0, len(messageBoxId)]
+        for value in messageBoxId:
+            sqrd.append(ord(value))
+        sqrd += [12, 0, 2]
+        sqrd += [10, 0, 1] + self.getIntBytes(int(time.time()*1000), 8)
+        sqrd += [10, 0, 2] + self.getIntBytes(int(endMessageId), 8) + [0]
+        sqrd += [8, 0, 3, 0, 0, 0, 200]
+        sqrd += [2, 0, 4, 1]
+        sqrd += [2, 0, 5, 0]
+        sqrd += [0]
+        sqrd += [8, 0, 3, 0, 0, 0, 0]
+        sqrd += [0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
         return self.tryReadData(data)
