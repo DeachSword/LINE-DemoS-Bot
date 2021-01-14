@@ -137,6 +137,8 @@ class Models(object):
                     _data[b] = e
                 elif c == 12:
                     _data[b] = self.readContainerStruct(data[a + 7:])
+                elif c == 13:
+                    _data[b] = self.readContainerStruct(data[a + 4:])
                 elif c == 15:
                     type = data[a + 7]
                     d = data[a + 11]
@@ -205,10 +207,13 @@ class Models(object):
                     _data[id] = b
                 nextPos = a + 7
         elif data[0] == 12:
-            a = self.readContainerStruct(data[3:], True)
-            #print(a) # 解決 nextPos ?   1/12: now work, huh?
-            _data[id] = a[0]
-            nextPos = a[1] + 4
+            if data[3] == 0:
+                _data[id] = {}
+                nextPos = 5
+            else:
+                a = self.readContainerStruct(data[3:], True)
+                _data[id] = a[0]
+                nextPos = a[1] + 4
         elif data[0] == 13:
             # dict
             # 0D 00 24 0B 0B 00 00 00 02 00 00 00 07
@@ -237,6 +242,11 @@ class Models(object):
                             _value = __value[0]
                             h = f + __value[1]
                             c = h
+                        elif a == 15:
+                            __value = self.readContainerStruct(data[f+1:], True)
+                            _value = __value[0]
+                            h = f + __value[1]
+                            c = h + 1
                         else:
                             _value = data[f + 5:h].decode()
                             c = h + 3 # ??
@@ -246,7 +256,6 @@ class Models(object):
             else:
                 nextPos = 9
                 _data[id] = {}
-                print(data[nextPos:].hex())
         elif data[0] == 15:
             type = data[3]
             d = data[7]
@@ -263,11 +272,14 @@ class Models(object):
                     if f[2] in [12, 13]:
                         e += f[1] + 1
                     else:
-                        e += f[1] + 10
+                        e += f[1] + 1
                 else:
                     print(f"[readContainerStruct_LIST(15)]不支援Type: {type}")
-            nextPos += e + 1
-        else:
+            if d > 0:
+                nextPos += e + 1
+            else:
+                nextPos = 8
+        elif data[0] != 0:
             print(f"[readContainerStruct]不支援Type: {data[0]} => ID: {id}")
         if nextPos > 0:
             data = data[nextPos:]

@@ -39,8 +39,9 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - getContacts
         - getGroup
         - getGroups
+        - getGroupsV2
         - getCompactGroup
-        - getChats (test)
+        - getChats
         - sendMessage (text only)
         - getGroupIdsJoined
         - getGroupIdsInvited
@@ -54,3 +55,36 @@ If you can help update this project, welcome to join our [Discord](https://disco
         - fetchOps
         - deleteOtherFromChat
         - cancelChatInvitation
+        - acceptChatInvitation
+        - getContactsV2
+        - acceptChatInvitationByTicket
+        - getPreviousMessagesV2WithRequest
+        - sendChatChecked
+        - unsendMessage
+        - findAndAddContactsByMid
+        - inviteIntoChat
+        - deleteSelfFromChat
+        - findChatByTicket
+        - updateChat (name only)
+        - sendPostback
+        - wakeUpLongPolling
+        - getMessageBoxes
+        - getMessageReadRange
+        - getChatRoomAnnouncementsBulk
+        - removeChatRoomAnnouncement
+        - returnTicket (test)
+        - getModulesV2
+        - getProduct
+        - markAsRead
+        - setClovaCredential (test)
+        - getCommonDomains
+        - acquireCallRoute
+        - acquireGroupCallRoute
+        - acquireOACallRoute
+        - acquireTestCallRoute
+        - inviteIntoGroupCall (DIED)
+        - issueRequestTokenWithAuthScheme
+        - fetchOperations
+        - openSession
+        - connectEapAccount
+        - verifyEapLogin
