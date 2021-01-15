@@ -1392,3 +1392,22 @@ class API(object):
         res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
         data = self.decData(res.content)
         return self.tryReadData(data)
+    
+    def testTMore(self):
+        _headers = {
+            'X-Line-Access': self.authToken, 
+            'x-lpqs': "/P5"
+        }
+        a = self.encHeaders(_headers)
+        # fetchOps (len: 8)
+        sqrd = [130, 33, 1, 8]
+        for value in "fetchOps":
+            sqrd.append(ord(value))
+        sqrd += [38, 136, 176, 2, 21, 200, 1, 22, 238, 179, 106, 22, 226]
+        sqrd += [1, 0]
+        sqr_rd = a + sqrd
+        _data = bytes(sqr_rd)
+        data = self.encData(_data)
+        res = self.req.post("https://gf.line.naver.jp/enc", data=data, headers=self.headers)
+        data = self.decData(res.content)
+        return data
