@@ -18,7 +18,6 @@ class Timeline():
         r = self.server.postContent(url, headers=hr)
         return r.json()
 
-    @loggedIn
     def updateProfileCoverById(self, objid, vObjid=None):
         data = {
             "homeId": self.profile.mid,
@@ -33,6 +32,16 @@ class Timeline():
         })
         r = self.server.postContent('https://ga2.line.naver.jp/hm/api/v1/home/cover.json', headers=hr, data=json.dumps(data))
         return r.json()
+
+    def sendContactV2(self, homeId, targetMids):
+        url = 'https://ga2.line.naver.jp/hm/api/v1/home/profile/share'
+        data = {"homeId":homeId,"shareType":"FLEX_OA_HOME_PROFILE_SHARING","targetMids":targetMids}
+        r = self.server.postContent(url, headers=self.server.timelineHeaders, data=json.dumps(data))
+        result =  r.json()
+        if result['message'] == 'success':
+            return  result['result']
+        else:
+            return False
 
 
     """ POST """
